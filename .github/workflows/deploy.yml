@@ -44,9 +44,9 @@ jobs:
       
       - name: Update DNS
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${secrets.CLOUDFLARE_API_TOKEN}
         run: |
           curl -X PUT "https://api.cloudflare.com/client/v4/user/tokens/verify" \
           -H "Authorization: Bearer HsoabgfSbNQVeHpg30hI14GOo8mZLixzk_7HhJY8" \
           -H "Content-Type:application/json"
-          --data '{"type":"CNAME","name":"Karazo.com","content":"https://us32shahid.github.io/Test-GHA-repo/","ttl":1,"priority":10,"proxied":false}'
+          -d '{"type":"CNAME","name":"Karazo.com","content":"https://us32shahid.github.io/Test-GHA-repo/","ttl":1,"priority":10,"proxied":false}'
