@@ -1,0 +1,23 @@
+#name: Email
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#  workflow_dispatch:
+#
+#jobs:
+#  send_email:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Repository
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: 3.x
+#
+#      - name: Send Email
+#        run: |
+#          python scripts/send_email.py

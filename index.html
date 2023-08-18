@@ -1,19 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My GitHub Pages Site</title>
+  <title>Advanced Webpage</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-gap: 20px;
+      background-image: linear-gradient(to bottom right, #87CEEB, #FFD700);
+    }
+    header {
+      grid-column: 1 / span 2;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    nav {
+      background-color: #444;
+      color: white;
+      padding: 10px;
+    }
+    main {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    aside {
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    footer {
+      grid-column: 1 / span 2;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Welcome to My GitHub Pages Site</h1>
+    <h1>Advanced Webpage</h1>
   </header>
+  <nav>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Services</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
   <main>
-    <p>This is a sample content for my GitHub Pages site.</p>
+    <h2>Welcome to Usama's Webpage</h2>
+    <p>A mission statement. This describes the purpose of your business as it relates to the industry or market you serve.</p>
   </main>
+  <aside>
+    <h3>Latest News</h3>
+    <p>Stay updated with our latest news and announcements.</p>
+  </aside>
   <footer>
-    <p>&copy; 2023 My GitHub Pages Site</p> 
+    <p>&copy; 2023 Advanced Webpage. All rights reserved.</p>
   </footer>
 </body>
 </html>
