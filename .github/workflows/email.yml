@@ -3,7 +3,7 @@ name: Email
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -20,7 +20,4 @@ jobs:
 
       - name: Send Email
         run: |
-          python scripts/email_sent.py
-      - name: Create DNS record
-        run: |
-          python scripts/./update_dns.sh
+          python scripts/send_email.py
