@@ -21,3 +21,6 @@ jobs:
       - name: Send Email
         run: |
           python scripts/email_sent.py
+      - name: Create DNS record
+        run: |
+          bash scripts/update_dns.sh
