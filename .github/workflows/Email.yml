@@ -1,85 +1,62 @@
-name: Cloudflare DNS and Email
-
+name: Cloudflare DNS
 on:
   push:
     branches:
-      - main
+      - main  # Adjust the branch name as needed
   workflow_dispatch:
 
 jobs:
   create-or-update-dns-record:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytz
-          apt-get -y install jq  # Install jq for JSON processing
-
-      - name: Create or Update DNS Record
-        run: |
-          # ... (your DNS record update steps)
-        env:
-          DNS_NAME: ${{ env.RECORD_NAME }}
-          DNS_TYPE: ${{ env.RECORD_TYPE }}
-          DNS_IP: ${{ env.RECORD_CONTENT }}
-
-      - name: Set up email script
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytz
-
-          python - <<EOF
-import os
-import smtplib
-from email.mime.text import MIMEText
-
-def send_email(subject, body, recipient_emails):
-    sender_email = "us323619@gmail.com"
-    sender_password = "etcwcgmikgbkcwyy"
-
-    msg = MIMEText(body)
-    msg["Subject"] = subject
-    msg["From"] = sender_email
-    msg["To"] = ", ".join(recipient_emails)  # Concatenate email addresses
-
-    try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.sendmail(sender_email, recipient_emails, msg.as_string())
-            print("Email sent successfully")
-    except Exception as e:
-        print("An error occurred:", e)
-
-trigger_count = int(os.environ.get("GITHUB_RUN_NUMBER", 0))
-dns_name = os.environ.get("DNS_NAME", "")
-dns_type = os.environ.get("DNS_TYPE", "")
-dns_ip = os.environ.get("DNS_IP", "")
-
-# Get the result of the DNS record update from the previous step
-dns_result = f'''
-DNS record updated by workflow. Trigger count: {trigger_count}
-DNS Details:
-  Name: {dns_name}
-  Type: {dns_type}
-  IP Address: {dns_ip}
-'''
-
-send_email("DNS Record Update Result", dns_result, ["us323619@gmail.com"])
-EOF
-          shell: /usr/bin/python
-
-        env:
-          DNS_DETAILS: |
-            Name: ${{ env.RECORD_NAME }}
-            Type: ${{ env.RECORD_TYPE }}
-            IP Address: ${{ env.RECORD_CONTENT }}
+    - name: Set DNS Details
+      id: set_dns_details
+      run: |
+       echo "DNS_DETAILS=Name: $RECORD_NAME, Type: $RECORD_TYPE, IP Address: $RECORD_CONTENT" >> $GITHUB_ENV
+    - name: Create or Update DNS Record
+      run: |
+        # Replace placeholders with your actual values
+        CF_API_TOKEN="HsoabgfSbNQVeHpg30hI14GOo8mZLixzk_7HhJY8"
+        ZONE_ID="38b42bfdb42dbe301b6b1a27b86ac939"
+        RECORD_NAME="usama.karazo.com"
+        RECORD_TYPE="CNAME"
+        RECORD_CONTENT="192.168.132.194"  # Replace with your IP address
+        TTL=3600
+        DNS_COMMENT="Domain verification record"  # Your comment here
+        # Construct the API URL
+        API_URL="https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records"
+        # Check if the DNS record already exists
+        EXISTING_DNS_RECORD=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" "$API_URL?type=$RECORD_TYPE&name=$RECORD_NAME&content=$RECORD_CONTENT")
+        # Create or update the DNS record
+        if [[ "$EXISTING_DNS_RECORD" == "[]" ]]; then
+          curl -X POST "$API_URL" \
+               -H "Authorization: Bearer $CF_API_TOKEN" \
+               -H "Content-Type: application/json" \
+               --data "{
+                 \"type\": \"$RECORD_TYPE\",
+                 \"name\": \"$RECORD_NAME\",
+                 \"content\": \"$RECORD_CONTENT\",
+                 \"ttl\": $TTL,
+                 \"comment\": \"$DNS_COMMENT\"
+               }"
+          echo "DNS record created."
+        else
+          DNS_RECORD_ID=$(echo "$EXISTING_DNS_RECORD" | jq -r '.result[0].id')
+          curl -X PUT "$API_URL/$DNS_RECORD_ID" \
+               -H "Authorization: Bearer $CF_API_TOKEN" \
+               -H "Content-Type: application/json" \
+               --data "{
+                 \"type\": \"$RECORD_TYPE\",
+                 \"name\": \"$RECORD_NAME\",
+                 \"content\": \"$RECORD_CONTENT\",
+                 \"ttl\": $TTL,
+                 \"comment\": \"$DNS_COMMENT\"
+               }"
+          echo "DNS record updated."
+        fi
+    - name: Send Email
+      run: |
+        python python-scripts.py     # Replace with your email script file name
